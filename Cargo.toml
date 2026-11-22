@@ -9,6 +9,16 @@ edition = { workspace = true }
 shared = { workspace = true }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
+axum = { workspace = true }
+chrono = { workspace = true }
 compact_str = { workspace = true }
+indexmap = { workspace = true }
+reqwest = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
+sqlx = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+utoipa-axum = { workspace = true }
+uuid = { workspace = true }
