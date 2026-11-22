@@ -10,6 +10,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button as MantineButton } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
@@ -26,6 +27,7 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import useWebsocketEvent, { SocketEvent, SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import { getServerStatus } from '../api.ts';
 import {
   type ConsoleAuthState,
   ENDED_VISIBLE_MS,
@@ -39,6 +41,8 @@ import {
   view,
 } from '../lib/console.ts';
 import { useExtTranslations } from '../translations.ts';
+import { errorText } from './AccountLinker.tsx';
+import { accountName, serverStatusKey } from './ServerSettingsCard.tsx';
 
 /** A login started from this tab gets `/auth persistence Encrypted` once it succeeds. */
 const AUTO_PERSIST_WINDOW_MS = 20 * 60_000;
@@ -62,6 +66,23 @@ function HytaleLoginCard() {
   );
   const canConsole = useServerCan('control.console');
   const canRestart = useServerCan('control.restart');
+
+  // the automatic login of this start (or why there was none), from the panel
+  const statusQuery = useQuery({
+    queryKey: serverStatusKey(serverUuid),
+    queryFn: () => getServerStatus(serverUuid),
+    staleTime: 30_000,
+  });
+  const status = statusQuery.data;
+  useEffect(() => {
+    if (power === 'starting' || power === 'running') statusQuery.refetch();
+  }, [power]);
+  const autoFailure =
+    status?.hytale && status.automatic && status.last?.error
+      ? errorText(t, status.last.error, status.last.error_message)
+      : null;
+  const autoAccount =
+    status?.hytale && status.last?.minted && status.last.source ? accountName(t, status, status.last.source) : null;
 
   const [auth, setAuth] = useState<ConsoleAuthState>(initialState);
   const [now, setNow] = useState(() => Date.now());
@@ -183,6 +204,9 @@ function HytaleLoginCard() {
                     {},
                   )}
                 </Text>
+                {autoFailure ? (
+                  <Text size='sm'>{`${t('card.auto.failed', {})}: ${autoFailure} ${t('card.auto.fallback', {})}`}</Text>
+                ) : null}
               </Stack>
             </Group>
             {authenticateButton}
@@ -237,10 +261,12 @@ function HytaleLoginCard() {
         </Shell>
       );
     case 'authenticated':
-      return <StatusLine auth={auth} onCheck={canConsole ? () => send('/auth status') : null} />;
+      return (
+        <StatusLine auth={auth} autoAccount={autoAccount} onCheck={canConsole ? () => send('/auth status') : null} />
+      );
     case 'none':
       return power === 'running' && auth.auth.status === 'unknown' && canConsole ? (
-        <StatusLine auth={auth} onCheck={() => send('/auth status')} />
+        <StatusLine auth={auth} autoAccount={null} onCheck={() => send('/auth status')} />
       ) : null;
   }
 }
@@ -348,7 +374,16 @@ function PromptCard({
   );
 }
 
-function StatusLine({ auth, onCheck }: { auth: ConsoleAuthState; onCheck: (() => void) | null }) {
+function StatusLine({
+  auth,
+  autoAccount,
+  onCheck,
+}: {
+  auth: ConsoleAuthState;
+  /** The linked account the panel signed this start in with. */
+  autoAccount: string | null;
+  onCheck: (() => void) | null;
+}) {
   const { t } = useExtTranslations();
   const { mode, profile, storage, status } = auth.auth;
   const details = useMemo(() => {
@@ -356,13 +391,14 @@ function StatusLine({ auth, onCheck }: { auth: ConsoleAuthState; onCheck: (() =>
     const parts: string[] = [];
     if (profile) parts.push(t('card.status.as', { profile }));
     const modeKey = mode as keyof typeof MODE_KEYS | null;
-    if (modeKey && modeKey in MODE_KEYS) parts.push(t(MODE_KEYS[modeKey], {}));
+    if (mode === 'EXTERNAL_SESSION' && autoAccount) parts.push(t('card.auto.signedIn', { account: autoAccount }));
+    else if (modeKey && modeKey in MODE_KEYS) parts.push(t(MODE_KEYS[modeKey], {}));
     else if (mode) parts.push(mode);
     if ((storage === 'Encrypted' || storage === 'Memory') && mode !== 'EXTERNAL_SESSION') {
       parts.push(t(storage === 'Encrypted' ? 'card.status.storage.Encrypted' : 'card.status.storage.Memory', {}));
     }
     return parts.join(' · ');
-  }, [status, mode, profile, storage]);
+  }, [status, mode, profile, storage, autoAccount]);
 
   return (
     <Group
