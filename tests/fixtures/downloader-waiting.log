@@ -1,0 +1,6 @@
+[hytale] First start: downloading the server. Log in with the code below if asked.
+Please visit the following URL to authenticate:
+https://oauth.accounts.hytale.com/oauth2/device/verify?user_code=Xk4mPq2T
+Or visit the following URL and enter the code:
+https://oauth.accounts.hytale.com/oauth2/device/verify
+Authorization code: Xk4mPq2T

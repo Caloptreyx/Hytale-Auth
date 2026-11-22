@@ -1,0 +1,10 @@
+[hytale] First start: downloading the server. Log in with the code below if asked.
+Please visit the following URL to authenticate:
+https://oauth.accounts.hytale.com/oauth2/device/verify?user_code=Xk4mPq2T
+Or visit the following URL and enter the code:
+https://oauth.accounts.hytale.com/oauth2/device/verify
+Authorization code: Xk4mPq2T
+2026.03.26-89796e57b
+downloading latest ("release" patchline) to ".hytale-server.zip"
+[hytale] Installed server 2026.03.26-89796e57b (release).
+openjdk version "25.0.1" 2025-10-21 LTS

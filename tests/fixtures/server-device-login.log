@@ -1,0 +1,34 @@
+openjdk version "25.0.1" 2025-10-21 LTS
+:/home/container$ java -Xms128M -XX:MaxRAMPercentage=95.0 -Duser.home=/home/container -XX:AOTCache=Server/HytaleServer.aot -jar Server/HytaleServer.jar --assets Assets.zip --bind 0.0.0.0:5520 --auth-mode authenticated
+[2026/03/04 04:59:54   INFO]           [HytaleServer] Starting HytaleServer
+[2026/03/04 04:59:54   INFO]           [HytaleServer] Loading config...
+[2026/03/04 04:59:54   INFO]           [HytaleServer] Authentication mode: AUTHENTICATED
+[2026/03/04 04:59:54   INFO]      [ServerAuthManager] No server tokens configured. Use /auth login to authenticate, or provide tokens via CLI/environment.
+[2026/03/04 04:59:54   INFO]      [ServerAuthManager] Server session ID: 1478cb26-b9a1-42c0-84cf-38b7fa74e062
+[2026/03/04 04:59:54   INFO]           [HytaleServer] Booting up HytaleServer - Version: 2026.03.26-89796e57b, Revision: 89796e57b0e1a7c2f1e0a9d4c3b2a1f0e9d8c7b6
+[2026/03/04 04:59:56   INFO]      [ServerAuthManager] Server certificate set: CN=localhost
+[2026/03/04 04:59:58   INFO]      [ServerAuthManager] Auth credential store: Memory
+[2026/03/04 05:00:03   INFO]    [HytaleServer]          Hytale Server Booted! [Multiplayer, Fresh Universe] took 8sec 210ms 838us 200ns
+[2026/03/04 05:00:03   WARN]    [HytaleServer] No server tokens configured. Use /auth login to authenticate.
+[2026/03/04 05:00:22   INFO]  [CommandManager] Console executed command: auth login device
+Starting OAuth2 device flow. Check console for verification URL.
+[2026/03/04 05:00:22   INFO] [AbstractCommand] ===================================================================
+[2026/03/04 05:00:22   INFO] [AbstractCommand] DEVICE AUTHORIZATION
+[2026/03/04 05:00:22   INFO] [AbstractCommand] ===================================================================
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Visit: https://oauth.accounts.hytale.com/oauth2/device/verify
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Enter code: JuXnmQxD
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Or visit: https://oauth.accounts.hytale.com/oauth2/device/verify?user_code=JuXnmQxD
+[2026/03/04 05:00:22   INFO] [AbstractCommand] ===================================================================
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Waiting for authorization (expires in 600 seconds)...
+[2026/03/04 05:02:03   INFO] [SessionServiceClient] Session Service client initialized for: https://sessions.hytale.com
+[2026/03/04 05:02:03   INFO] [SessionServiceClient] Fetching game profiles...
+[2026/03/04 05:02:03   INFO] [SessionServiceClient] Found 1 game profile(s)
+[2026/03/04 05:02:03   INFO]    [ServerAuthManager] Auto-selected profile: TinyTaru (deddd686-d113-433c-87bc-62064550596c)
+[2026/03/04 05:02:03   INFO] [SessionServiceClient] Creating game session...
+[2026/03/04 05:02:04   INFO] [SessionServiceClient] Successfully created game session
+[2026/03/04 05:02:04   INFO]    [ServerAuthManager] Token refresh scheduled in 3292 seconds
+[2026/03/04 05:02:04   INFO]    [ServerAuthManager] Authentication successful! Mode: OAUTH_DEVICE
+Authentication successful! Use "/auth status" to view details.
+WARNING: Credentials stored in memory only - they will be lost on restart!
+To persist credentials, run: /auth persistence <type>
+Available types: Memory, Encrypted

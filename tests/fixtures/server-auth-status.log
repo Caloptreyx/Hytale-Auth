@@ -1,0 +1,9 @@
+[2026/03/05 11:00:00   INFO]  [CommandManager] Console executed command: auth status
+=== Server Authentication Status ===
+Connection Auth: Authenticated (mTLS + JWT)
+Token Source: OAuth Store
+Profile: TinyTaru (deddd686-d113-433c-87bc-62064550596c)
+Session Token: Present
+Identity Token: Present
+Expiry: 00:54:12 remaining
+Certificate: 3F9A1C0B7E6D5A4B...

@@ -1,0 +1,12 @@
+[2026/03/04 05:00:22   INFO]  [CommandManager] Console executed command: auth login device
+Starting OAuth2 device flow. Check console for verification URL.
+[2026/03/04 05:00:22   INFO] [AbstractCommand] ===================================================================
+[2026/03/04 05:00:22   INFO] [AbstractCommand] DEVICE AUTHORIZATION
+[2026/03/04 05:00:22   INFO] [AbstractCommand] ===================================================================
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Visit: https://oauth.accounts.hytale.com/oauth2/device/verify
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Enter code: JuXnmQxD
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Or visit: https://oauth.accounts.hytale.com/oauth2/device/verify?user_code=JuXnmQxD
+[2026/03/04 05:00:22   INFO] [AbstractCommand] ===================================================================
+[2026/03/04 05:00:22   INFO] [AbstractCommand] Waiting for authorization (expires in 600 seconds)...
+[2026/03/04 05:10:23   WARN]    [ServerAuthManager] OAuth device flow failed: Device code expired
+Device authentication failed. Check server logs.

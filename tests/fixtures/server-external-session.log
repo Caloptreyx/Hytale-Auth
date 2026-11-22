@@ -1,0 +1,15 @@
+[2026/03/05 09:12:01   INFO]           [HytaleServer] Starting HytaleServer
+[2026/03/05 09:12:01   INFO]           [HytaleServer] Loading config...
+[2026/03/05 09:12:01   INFO]           [HytaleServer] Authentication mode: AUTHENTICATED
+[2026/03/05 09:12:01   INFO]      [ServerAuthManager] Session token loaded from environment
+[2026/03/05 09:12:01   INFO]      [ServerAuthManager] Identity token loaded from environment
+[2026/03/05 09:12:01   INFO]      [SessionServiceClient] Session Service client initialized for: https://sessions.hytale.com
+[2026/03/05 09:12:02   INFO]      [SessionServiceClient] Successfully fetched JWKS with 1 keys
+[2026/03/05 09:12:02   INFO]      [ServerAuthManager] Identity token validated for HostAccount (deddd686-d113-433c-87bc-62064550596c)
+[2026/03/05 09:12:02   INFO]      [ServerAuthManager] Session token validated
+[2026/03/05 09:12:02   INFO]      [ServerAuthManager] Auth mode: EXTERNAL_SESSION
+[2026/03/05 09:12:02   INFO]      [ServerAuthManager] Token refresh scheduled in 3297 seconds
+[2026/03/05 09:12:02   INFO]      [ServerAuthManager] Server session ID: 5f0c1d2e-3a4b-4c5d-8e6f-7a8b9c0d1e2f
+[2026/03/05 09:12:02   INFO]           [HytaleServer] Booting up HytaleServer - Version: 2026.03.26-89796e57b, Revision: 89796e57b0e1a7c2f1e0a9d4c3b2a1f0e9d8c7b6
+[2026/03/05 09:12:04   INFO]      [ServerAuthManager] Auth credential store: Memory
+[2026/03/05 09:12:09   INFO]    [HytaleServer]          Hytale Server Booted! [Multiplayer] took 7sec 512ms 101us 300ns

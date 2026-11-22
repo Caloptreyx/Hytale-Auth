@@ -1,0 +1,4 @@
+[2026/03/05 09:12:01   INFO]      [ServerAuthManager] Session token loaded from environment
+[2026/03/05 09:12:01   INFO]      [ServerAuthManager] Identity token loaded from environment
+[2026/03/05 09:12:02   WARN]      [ServerAuthManager] Identity token validation failed
+[2026/03/05 09:12:02 SEVERE]      [ServerAuthManager] Token validation failed. Server starting unauthenticated.
