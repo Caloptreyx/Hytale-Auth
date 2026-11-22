@@ -11,6 +11,12 @@
 //! tokens the running container already has are passed on unchanged, so a sync does not flag the
 //! server for a restart, and no session is minted that no server would use.
 //!
+//! `starting` also lasts while the server boots (and while the downloader waits for its login), so
+//! a sync can arrive then too. The session the container got is therefore reused while it has more
+//! than [`REUSE_MARGIN`] left and is still the one of the chosen account and profile; that also
+//! covers quick restarts. Sessions are never ended by the panel: a running server might hold them,
+//! and they expire within the hour anyway.
+//!
 //! Whatever goes wrong here, the server still starts: without tokens, and the console helper takes
 //! over. An error from the hook would fail Wings' request and the start with it.
 use crate::{
@@ -22,6 +28,7 @@ use compact_str::CompactString;
 use indexmap::IndexMap;
 use shared::{
     State,
+    crypt::token_digest,
     models::server::{RemoteApiServer, Server},
 };
 use std::time::Duration;
@@ -32,6 +39,9 @@ pub const IDENTITY_ENV: &str = "HYTALE_SERVER_IDENTITY_TOKEN";
 /// Wings waits for the configuration; a slow Hytale must not hold the start up for long.
 const HOOK_TIMEOUT: Duration = Duration::from_secs(15);
 const WINGS_TIMEOUT: Duration = Duration::from_secs(4);
+/// A session handed out at a start is handed out again while it has this much left: the server
+/// refreshes it 5 minutes before it expires, so until then it is exactly as minted.
+const REUSE_MARGIN: chrono::Duration = chrono::Duration::minutes(30);
 
 /// The session and identity token the server gets, if any.
 pub struct Plan(Option<(Secret, Secret)>);
@@ -142,6 +152,19 @@ async fn decide(state: &State, server: &Server) -> Result<Plan, anyhow::Error> {
         .profile
         .clone()
         .ok_or_else(|| anyhow::anyhow!("the account has no game profile"))?;
+    if let Some((session, _)) = &wings.tokens
+        && servers::reusable(
+            db,
+            server.uuid,
+            account.id,
+            &profile.username,
+            &token_digest(session.expose()),
+            REUSE_MARGIN,
+        )
+        .await?
+    {
+        return Ok(Plan(wings.tokens));
+    }
     match mint(state, account.id, profile.uuid).await {
         Ok(session) => {
             servers::record_session(
@@ -150,25 +173,21 @@ async fn decide(state: &State, server: &Server) -> Result<Plan, anyhow::Error> {
                 source,
                 account.id,
                 &profile.username,
+                &token_digest(session.session_token.expose()),
                 session.expires_at,
             )
             .await?;
             if account.error.is_some() {
                 accounts::clear_error(db, account.id).await?;
             }
-            if let Some((old_session, _)) = wings.tokens {
-                // the previous run's session: its server is gone
-                let client = state.client.clone();
-                tokio::spawn(async move { hytale::end_game_session(&client, &old_session).await });
-            }
             Ok(Plan(Some((session.session_token, session.identity_token))))
         }
         Err(AccessError::Hytale(err)) => {
             tracing::warn!(
-                server = %server.uuid,
-                account = %account.id,
-                code = err.code(),
-                "Hytale Auth: the server starts without a login: {}",
+                "Hytale Auth: server {} starts without a login ({}, account {}): {}",
+                server.uuid,
+                err.code(),
+                account.id,
                 err.message()
             );
             servers::record_error(db, server.uuid, source, account.id, &err).await;

@@ -80,33 +80,63 @@ fn source_name(source: Source) -> &'static str {
     }
 }
 
-/// The server started with a game session of `account`.
+/// The server started with a game session of `account`. Only a digest of the session token is
+/// kept, to recognise it in the container's environment later.
 pub async fn record_session(
     db: &Database,
     server: Uuid,
     source: Source,
     account: Uuid,
     profile_name: &str,
+    session_digest: &str,
     expires: Option<DateTime<Utc>>,
 ) -> Result<(), sqlx::Error> {
     sqlx::query(
         "INSERT INTO dev_caloptreyx_hytaleauth_servers
-             (server_uuid, account_id, source, profile_name, minted, session_expires)
-         VALUES ($1, $2, $3, $4, now(), $5)
+             (server_uuid, account_id, source, profile_name, session_digest, minted, session_expires)
+         VALUES ($1, $2, $3, $4, $5, now(), $6)
          ON CONFLICT (server_uuid) DO UPDATE SET
              account_id = EXCLUDED.account_id, source = EXCLUDED.source,
-             profile_name = EXCLUDED.profile_name, minted = EXCLUDED.minted,
-             session_expires = EXCLUDED.session_expires,
+             profile_name = EXCLUDED.profile_name, session_digest = EXCLUDED.session_digest,
+             minted = EXCLUDED.minted, session_expires = EXCLUDED.session_expires,
              error = NULL, error_message = NULL, error_at = NULL",
     )
     .bind(server)
     .bind(account)
     .bind(source_name(source))
     .bind(profile_name)
+    .bind(session_digest)
     .bind(expires)
     .execute(db.write())
     .await?;
     Ok(())
+}
+
+/// Whether the session the container holds (by digest) is the one the panel minted for this
+/// server, with the same account and profile, and has more than `margin` left.
+pub async fn reusable(
+    db: &Database,
+    server: Uuid,
+    account: Uuid,
+    profile_name: &str,
+    session_digest: &str,
+    margin: chrono::Duration,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+             SELECT 1 FROM dev_caloptreyx_hytaleauth_servers
+             WHERE server_uuid = $1 AND account_id = $2 AND profile_name = $3
+                 AND session_digest = $4 AND error IS NULL
+                 AND session_expires > now() + make_interval(secs => $5)
+         )",
+    )
+    .bind(server)
+    .bind(account)
+    .bind(profile_name)
+    .bind(session_digest)
+    .bind(margin.num_seconds() as f64)
+    .fetch_one(db.read())
+    .await
 }
 
 /// The server started without a login because minting its session failed.
@@ -123,7 +153,7 @@ pub async fn record_error(
          VALUES ($1, $2, $3, $4, $5, now())
          ON CONFLICT (server_uuid) DO UPDATE SET
              account_id = EXCLUDED.account_id, source = EXCLUDED.source,
-             minted = NULL, session_expires = NULL,
+             minted = NULL, session_expires = NULL, session_digest = NULL,
              error = EXCLUDED.error, error_message = EXCLUDED.error_message,
              error_at = EXCLUDED.error_at",
     )

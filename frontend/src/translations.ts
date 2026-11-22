@@ -146,6 +146,7 @@ const translations = defineTranslations({
       linkOwn: 'Link your own account',
       saved: 'Saved. It applies from the next start.',
       lastOk: 'Last start: signed in as {profile}.',
+      lastError: 'Last start with {account}: {error}',
     },
   },
 });

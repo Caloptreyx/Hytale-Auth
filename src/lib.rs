@@ -43,15 +43,21 @@ async fn keepalive(state: &State) -> Result<(), anyhow::Error> {
     accounts::delete_expired_links(&state.database).await?;
     for id in accounts::idle_accounts(&state.database, KEEPALIVE_AFTER).await? {
         match accounts::access_token(state, id, true).await {
-            Ok(_) => tracing::debug!(account = %id, "Hytale Auth: refreshed an idle login"),
+            Ok(_) => tracing::debug!("Hytale Auth: refreshed the idle login of account {id}"),
             Err(accounts::AccessError::Hytale(err)) => {
-                tracing::warn!(account = %id, code = err.code(), "Hytale Auth: could not refresh an idle login: {}", err.message());
+                tracing::warn!(
+                    "Hytale Auth: could not refresh the idle login of account {id} ({}): {}",
+                    err.code(),
+                    err.message()
+                );
                 if !matches!(err, hytale::HytaleError::Relink(_)) {
                     accounts::record_error(&state.database, id, &err).await;
                 }
             }
             Err(accounts::AccessError::Panel(err)) => {
-                tracing::warn!(account = %id, "Hytale Auth: could not refresh an idle login: {err:#}");
+                tracing::warn!(
+                    "Hytale Auth: could not refresh the idle login of account {id}: {err:#}"
+                );
             }
         }
     }

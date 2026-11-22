@@ -14,7 +14,6 @@ const DEVICE_AUTH_URL: &str = "https://oauth.accounts.hytale.com/oauth2/device/a
 const TOKEN_URL: &str = "https://oauth.accounts.hytale.com/oauth2/token";
 const PROFILES_URL: &str = "https://account-data.hytale.com/my-account/get-profiles";
 const NEW_SESSION_URL: &str = "https://sessions.hytale.com/game-session/new";
-const SESSION_URL: &str = "https://sessions.hytale.com/game-session";
 const DEVICE_GRANT: &str = "urn:ietf:params:oauth:grant-type:device_code";
 
 const TIMEOUT: Duration = Duration::from_secs(10);
@@ -374,23 +373,6 @@ pub async fn new_game_session(
         .map_err(unavailable)?;
     let (status, body) = read(response).await?;
     parse_game_session(status, &body)
-}
-
-/// Ends a game session no server uses any more, so it does not count against the account's
-/// session limit until it expires. Best effort.
-pub async fn end_game_session(client: &reqwest::Client, session_token: &Secret) {
-    let result = client
-        .delete(SESSION_URL)
-        .timeout(TIMEOUT)
-        .bearer_auth(session_token.expose())
-        .send()
-        .await;
-    if let Err(err) = result {
-        tracing::debug!(
-            "ending an old Hytale game session failed: {}",
-            err.without_url()
-        );
-    }
 }
 
 #[cfg(test)]

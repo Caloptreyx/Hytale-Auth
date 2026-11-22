@@ -262,7 +262,12 @@ function AccountDetails({
           className='min-w-56'
         />
         {canManage ? (
-          <Button variant='default' loading={busy === 'reload'} onClick={onReload}>
+          <Button
+            variant='default'
+            loading={busy === 'reload'}
+            disabled={account.status !== 'linked'}
+            onClick={onReload}
+          >
             {t('link.reload', {})}
           </Button>
         ) : null}

@@ -85,7 +85,12 @@ function HytaleSettingsCard() {
           ) : null}
           {status.last?.error ? (
             <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
-              {errorText(t, status.last.error, status.last.error_message)}
+              {status.last.source
+                ? t('server.lastError', {
+                    account: accountName(t, status, status.last.source),
+                    error: errorText(t, status.last.error, status.last.error_message),
+                  })
+                : errorText(t, status.last.error, status.last.error_message)}
             </Alert>
           ) : status.last?.minted && status.last.profile_name ? (
             <Text size='sm' c='dimmed'>

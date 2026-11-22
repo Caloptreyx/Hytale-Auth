@@ -87,8 +87,11 @@ the start command, which the console echoes.
 The same configuration is built when the panel syncs a server to Wings (after schedule or
 startup changes) and when Wings boots. Those get the tokens the running container already has,
 so a sync does not flag the server for a restart and no session is created that no server uses.
-The previous run's session is ended when a new one is created, so stopped servers do not count
-against the account's session limit.
+Wings also reports `starting` for as long as the server boots (and while the downloader waits for
+its login), so the session a start handed out is handed out again while it has more than 30
+minutes left and the account and profile are unchanged (the panel keeps a SHA-256 digest of it to
+recognise it). A quick restart reuses it too. The panel never ends sessions itself, since a
+running server may hold them; unused ones expire within the hour.
 
 If anything fails (Hytale unreachable, the login expired, the session limit reached), the server
 starts anyway, without tokens. The error is shown on the console card, the server's settings card
