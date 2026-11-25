@@ -16,6 +16,24 @@ Made for servers on the Caloptreyx Hytale egg
 ([game-eggs `hytale/egg-hytale.yml`](https://github.com/Caloptreyx/game-eggs/tree/main/hytale),
 image `ghcr.io/caloptreyx/games:hytale`), and works with any egg that runs `HytaleServer.jar`.
 
+## Screenshots
+
+**Console download login**: one-click Hytale login button, device code, and expiry timer shown above the console.
+
+![Console download login card](docs/screenshots/console-download-login.png)
+
+**Admin host account**: link a shared host Hytale account and control automatic sign-in policies.
+
+![Admin host account linking](docs/screenshots/admin-host-linking.png)
+
+**Account linking**: users can link their own Hytale account under **Account → Hytale Account**.
+
+![User account Hytale linking](docs/screenshots/account-linking.png)
+
+**Server settings**: toggle automatic Hytale sign-in per server.
+
+![Server settings Hytale login card](docs/screenshots/server-settings.png)
+
 ## Console helper
 
 Above the console of every Hytale server (a start command running `HytaleServer.jar`, or an image
